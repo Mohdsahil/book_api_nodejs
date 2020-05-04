@@ -39,14 +39,14 @@ router.post('/register', (req, res) => {
                             console.log(err)
                             return res.status(500).json({
                                 success: 0,
-                                message: err
+                                message: "internel server error"
                             })
                         }
                         var token = jwt.sign({ id: result.insertId }, process.env.TOKEN_KEY, { expiresIn: 86400 })
                         return res.status(200).json({
                             success: 1,
                             token: token,
-                            message: result
+                            data: result
                         })
                     }
                 )
@@ -60,6 +60,51 @@ router.post('/register', (req, res) => {
             }
         }
     )
+
+})
+
+router.post('/login', (req, res) => {
+    const { name, email, password } = req.body;
+
+    pool.query(`select * from users where email=?`,
+        [
+            email
+        ],
+        (err, result, fields) => {
+            if (err) {
+                console.log(err)
+                return res.status(500).json({
+                    success: 1,
+                    message: "internel server error.."
+                })
+            }
+
+            if (result.length < 1) {
+                return res.json({
+                    success: 0,
+                    message: "invalie email or password......"
+                })
+            }
+            console.log(result[0].password)
+
+            var passwordIsValid = bcrypt.compareSync(password, result[0].password)
+            if (!passwordIsValid) {
+                return res.status(401).json({
+                    success: 0,
+                    message: "invalie email or password......"
+                })
+            }
+            var token = jwt.sign({ id: result.insertedId }, process.env.TOKEN_KEY, { expiresIn: 86400 })
+            return res.status(200).json({
+                success: 1,
+                token: token,
+                data: result,
+
+            })
+        }
+    )
+
+
 
 })
 
@@ -133,48 +178,32 @@ router.get('/:name:type', (req, res) => {
 })
 
 
-router.post('/login', (req, res) => {
-    const { name, email, password } = req.body;
+router.post('/readed', checktoken, (req, res) => {
+    const data = req.body
 
-    pool.query(`select * from users where email=?`,
+    pool.query(`INSERT INTO readinghistory(book_id, user_id, read_time_count, rating, review) values(?,?,?,?,?)`,
         [
-            email
+            data.book_id,
+            data.user_id,
+            data.time_count,
+            data.rating,
+            data.review
         ],
         (err, result, fields) => {
             if (err) {
                 console.log(err)
                 return res.status(500).json({
-                    success: 1,
-                    message: err
-                })
-            }
-
-            if (result.length < 1) {
-                return res.json({
                     success: 0,
-                    message: "invalie email or password......"
+                    message: "internal server error"
                 })
             }
-            console.log(result[0].password)
-
-            var passwordIsValid = bcrypt.compareSync(password, result[0].password)
-            if (!passwordIsValid) {
-                return res.status(401).json({
-                    success: 0,
-                    message: "unauthorised access"
-                })
-            }
-            var token = jwt.sign({ id: result.insertedId }, process.env.TOKEN_KEY, { expiresIn: 86400 })
             return res.status(200).json({
                 success: 1,
-                token: token,
-                message: result
+                message: "read history updated"
             })
         }
     )
-
-
-
 })
+
 
 module.exports = router

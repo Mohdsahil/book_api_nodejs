@@ -1,4 +1,5 @@
 require('dotenv').config()
+
 const router = require('express').Router()
 const fileUpload = require('express-fileupload');
 const pool = require('../../config/dbcon')
@@ -12,7 +13,6 @@ router.use(fileUpload());
 
 
 
-
 router.get('/', (req, res) => {
     res.status(200).json({
         success: 1,
@@ -20,16 +20,20 @@ router.get('/', (req, res) => {
     })
 })
 
-router.post('/upload', checktoken, (req, res) => {
+router.post('/upload', (req, res) => {
     const data = req.body
     // console.log(req.files)
     if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).json({ msg: "No files were uploaded." });
+        return res.status(400).json({ message: "No files were uploaded." });
     }
     let book = req.files.book;
+    let thumbnail = req.files.thumbnail;
     book.name = Date.now() + "_" + book.name;
-    let path = './upload/' + book.name;
-    book.mv(path, function (err) {
+    thumbnail.name = Date.now() + "_" + thumbnail.name;
+
+    let book_path = 'http://localhost:7000/books' + '/' + book.name;
+    let thumbnail_path = 'http://localhost:7000/thumbnail' + '/' + thumbnail.name;
+    book.mv('upload/books/' + book.name, function (err) {
         if (err) {
             console.log(err)
             return res.status(500).json({
@@ -38,7 +42,17 @@ router.post('/upload', checktoken, (req, res) => {
             });
         }
     });
-    pool.query(`INSERT INTO books ( book_name, book_author, book_type, book_language, adult, book_keywords, book_discription, book_link) VALUES(?,?,?,?,?,?,?,?)`,
+    thumbnail.mv('upload/thumbnail/' + thumbnail.name, function (err) {
+        if (err) {
+            console.log(err)
+            return res.status(500).json({
+                success: 0,
+                message: "internal server error to upload the book "
+            });
+        }
+    });
+
+    pool.query(`INSERT INTO books ( book_name, book_author, book_type, book_language, adult, book_keywords, book_discription, book_link, book_thumbnail) VALUES(?,?,?,?,?,?,?,?,?)`,
         [
             data.book_name,
             data.book_author,
@@ -47,7 +61,8 @@ router.post('/upload', checktoken, (req, res) => {
             data.adult,
             data.book_keywords,
             data.book_discription,
-            path
+            book_path,
+            thumbnail_path
         ],
         (error, result, fields) => {
             if (error) {
@@ -249,6 +264,5 @@ router.post('/login', (req, res) => {
 
 
 })
-
 
 module.exports = router;
