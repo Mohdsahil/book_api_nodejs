@@ -9,7 +9,12 @@ var cors = require('cors')
 app.use(express.json())
 app.use(express.static('upload'));
 app.use(cors())
-
+app.get('/', (req, res) => {
+    res.json({
+        success: 1,
+        message: "app is running"
+    })
+})
 app.use('/api/admin', adminRouter)
 app.use('/api/users', userRouter)
 
