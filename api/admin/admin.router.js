@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
     })
 })
 
-router.post('/upload', (req, res) => {
+router.post('/upload', checktoken, (req, res) => {
     const data = req.body
     // console.log(req.files)
     if (!req.files || Object.keys(req.files).length === 0) {
