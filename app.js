@@ -13,6 +13,7 @@ app.use(cors())
 app.use('/api/admin', adminRouter)
 app.use('/api/users', userRouter)
 
-app.listen(process.env.APP_PORT, () => {
-    console.log(`Server is running of port...${process.env.APP_PORT}`)
+const PORT = process.env.PORT || process.env.APP_PORT
+app.listen(PORT, () => {
+    console.log(`Server is running of port...${PORT}`)
 })
