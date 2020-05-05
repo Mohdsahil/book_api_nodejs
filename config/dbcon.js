@@ -1,7 +1,7 @@
 const { createPool } = require('mysql')
 
 const pool = createPool({
-    host: "110.225.84.213",
+    host: "192.168.43.39",
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
