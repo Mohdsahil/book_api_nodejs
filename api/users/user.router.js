@@ -74,7 +74,7 @@ router.post('/login', (req, res) => {
             if (err) {
                 console.log(err)
                 return res.status(500).json({
-                    success: 1,
+                    success: 0,
                     message: "internel server error.."
                 })
             }
