@@ -1,25 +1,32 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const adminRouter = require("./api/admin/admin.router");
-const userRouter = require("./api/users/user.router");
+const mongoose = require("mongoose");
+// const adminRouter = require("./api/admin/admin.router");
+// const userRouter = require("./api/users/user.router");
+
+const authRouter = require("./routes/auth");
+const userRouter = require("./routes/user");
+const categoryRouter = require("./routes/category");
+const bookRouter = require("./routes/book");
+const reviewRouter = require("./routes/review");
+
 var cors = require("cors");
 
 app.use(express.json());
 app.use(express.static("upload"));
 
-// // app.use(cors({ origin: "http://127.0.0.1/ReadBook/" }));
-
-app.use((req, res, next) => {
-  var userIP = req.socket.remoteAddress;
-  var hostname = req.hostname;
-  console.log(hostname);
-
-  //   res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1/ReadBook/");
-  //   if (req.headers.origin === "http://127.0.0.1/ReadBook/") next();
-  //   else res.json({ success: 0, message: "not allow" });
-  next();
-});
+// mongoose db connect
+mongoose
+  .connect(process.env.MANGOOSE_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  })
+  .then(() => console.log("DB CONNECTED..!!"))
+  .catch((err) => {
+    console.log(err);
+  });
 
 app.get("/", (req, res) => {
   res.json({
@@ -27,8 +34,15 @@ app.get("/", (req, res) => {
     message: "app is running",
   });
 });
-app.use("/api/admin", adminRouter);
-app.use("/api/users", userRouter);
+
+app.use("/api", authRouter);
+app.use("/api", userRouter);
+app.use("/api", categoryRouter);
+app.use("/api", bookRouter);
+app.use("/api", reviewRouter);
+
+// app.use("/api/admin", adminRouter);
+// app.use("/api/users", userRouter);
 
 const PORT = process.env.PORT || process.env.APP_PORT;
 app.listen(PORT, () => {
