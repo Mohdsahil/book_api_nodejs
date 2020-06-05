@@ -2,8 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-// const adminRouter = require("./api/admin/admin.router");
-// const userRouter = require("./api/users/user.router");
+const path = require("path");
 
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
@@ -41,10 +40,16 @@ app.use("/api", categoryRouter);
 app.use("/api", bookRouter);
 app.use("/api", reviewRouter);
 
-// app.use("/api/admin", adminRouter);
-// app.use("/api/users", userRouter);
+if (process.env.NODE_ENV === "production") {
+  // set static folder
+  app.use(express.static("client/build"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 
-const PORT = process.env.PORT || process.env.APP_PORT;
+const PORT = process.env.PORT || 7000;
+
 app.listen(PORT, () => {
   console.log(`Server is running of port...${PORT}`);
 });
