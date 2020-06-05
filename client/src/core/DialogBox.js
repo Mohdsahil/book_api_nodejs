@@ -175,7 +175,7 @@ const DialogBox = ({ book = book }) => {
 
         <iframe
           src={`${book.pdf}#toolbar=0`}
-          style={{ width: "100%", height: "510px", position: "relative" }}
+          style={{ width: "100%", height: "600px", position: "relative" }}
           frameBorder="0"
         ></iframe>
       </Dialog>
