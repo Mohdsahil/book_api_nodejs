@@ -1,3 +1,4 @@
+require("dotenv").config();
 const Book = require("../models/book");
 const formidable = require("formidable");
 const fileUpload = require("express-fileupload");
@@ -45,8 +46,8 @@ exports.createBook = (req, res) => {
   pdf.name = Date.now() + "_" + pdf.name;
   thumbnail.name = Date.now() + "_" + thumbnail.name;
 
-  let book_path = "http://localhost:7000/books" + "/" + pdf.name;
-  let thumbnail_path = "http://localhost:7000/thumbnail" + "/" + thumbnail.name;
+  let book_path = `${process.env.DOMAIN}/books` + "/" + pdf.name;
+  let thumbnail_path = `${process.env.DOMAIN}/thumbnail` + "/" + thumbnail.name;
 
   pdf.mv("upload/books/" + pdf.name, function (err) {
     if (err) {
