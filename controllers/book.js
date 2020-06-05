@@ -1,7 +1,7 @@
 const Book = require("../models/book");
 const formidable = require("formidable");
 const fileUpload = require("express-fileupload");
-
+const path = require("path");
 const _ = require("lodash");
 const fs = require("fs");
 
@@ -18,8 +18,8 @@ exports.getBookById = (req, res, next, id) => {
 };
 
 exports.getBook = (req, res) => {
-  req.book.thumbnail = undefined;
-  req.book.pdf = undefined;
+  // req.book.thumbnail = undefined;
+  // req.book.pdf = undefined;
   return res.json(req.book);
 };
 
@@ -36,9 +36,9 @@ exports.pdf = (req, res) => {
 
 exports.createBook = (req, res) => {
   const data = req.body;
-  // console.log(req.files)
+  console.log(req.files);
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).json({ message: "No files were uploaded." });
+    return res.status(400).json({ error: "No files were uploaded." });
   }
   let pdf = req.files.pdf;
   let thumbnail = req.files.thumbnail;
@@ -47,6 +47,7 @@ exports.createBook = (req, res) => {
 
   let book_path = "http://localhost:7000/books" + "/" + pdf.name;
   let thumbnail_path = "http://localhost:7000/thumbnail" + "/" + thumbnail.name;
+
   pdf.mv("upload/books/" + pdf.name, function (err) {
     if (err) {
       console.log(err);
@@ -56,6 +57,7 @@ exports.createBook = (req, res) => {
       });
     }
   });
+
   thumbnail.mv("upload/thumbnail/" + thumbnail.name, function (err) {
     if (err) {
       console.log(err);
@@ -73,6 +75,7 @@ exports.createBook = (req, res) => {
 
   book.save((err, book) => {
     if (err) {
+      console.log(err);
       res.status(400).json({
         error: "error to upload the book",
       });
@@ -83,12 +86,31 @@ exports.createBook = (req, res) => {
 
 exports.deleteBook = (req, res) => {
   let book = req.book;
+  // let book_path =
+  //   "http://localhost:7000/upload/books/" + path.basename(book.pdf);
+  // let book_thumbnail =
+  //   "http://localhost:7000/upload/thumbnail/" + path.basename(book.thumbnail);
+
   book.remove((err, deletedBook) => {
     if (err || !deletedBook) {
       return res.status(400).json({
         error: "Error to remove the book",
       });
     }
+    // try {
+    //   fs.unlinkSync(book_path);
+    //   //file removed
+    // } catch (err) {
+    //   console.error(err);
+    //   return res.status(400).json({ error: "Error to delete book" });
+    // }
+    // try {
+    //   fs.unlinkSync(book_thumbnail);
+    //   //file removed
+    // } catch (err) {
+    //   return res.status(400).json({ error: "Error to delete thumbnail" });
+    //   console.error(err);
+    // }
     res.json({
       message: "Book removed successfully",
       deletedBook,
@@ -101,7 +123,6 @@ exports.getAllBook = (req, res) => {
   let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
 
   Book.find()
-    .select("-pdf")
     .populate("category")
     .sort([["_id", "desc"]])
     .exec((err, books) => {

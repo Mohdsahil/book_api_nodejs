@@ -37,8 +37,18 @@ exports.createReadedHistory = (req, res) => {
   });
 };
 
+exports.getReviewById = (req, res, next, id) => {
+  Review.findById(id).exec((err, review) => {
+    if (err || !review) {
+      return res.status(400).json({ error: "Review Not found" });
+    }
+    req.review = review;
+    next();
+  });
+};
+
 exports.getReviewByBookId = (req, res) => {
-  Review.find({ book: req.book })
+  Book.find({ book: req.book })
     .populate("user", "email")
     .sort([["_id", "desc"]])
     .exec((err, reviews) => {
@@ -64,4 +74,20 @@ exports.getAllReview = (req, res) => {
       }
       res.json(reviews);
     });
+};
+
+exports.deleteReview = (req, res) => {
+  let review = req.review;
+
+  review.remove((err, deletedReview) => {
+    if (err || !deletedReview) {
+      return res.status(400).json({
+        error: "Error to remove the book",
+      });
+    }
+    res.json({
+      message: "Review Deleted Successfully",
+      deletedReview,
+    });
+  });
 };

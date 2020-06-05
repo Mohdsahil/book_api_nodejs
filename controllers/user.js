@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Book = require("../models/book");
 const ReadHistory = require("../models/readedHistory");
 
 exports.getUserById = (req, res, next, id) => {
@@ -37,18 +38,19 @@ exports.updateUser = (req, res) => {
 };
 
 exports.userReadedBookList = (req, res) => {
-  ReadHistory.find(
-    { user: req.profile._id }
-      .populate("user", "_id book")
-      .exec((err, readedBook) => {
-        if (err) {
-          return res.status(400).json({
-            error: "No Book read Yed",
-          });
-        }
-        return res.json(readedBook);
-      })
-  );
+  ReadHistory.find({ user: req.profile._id })
+    .populate("book", "name author thumbnail, pdf")
+    .distinct("book")
+    .exec((err, readedBook) => {
+      if (err) {
+        return res.status(400).json({
+          error: "No Book read Yed",
+        });
+      }
+      Book.find({ _id: { $in: readedBook } }, function (err, result) {
+        res.json(result);
+      });
+    });
 };
 
 exports.getUserByMaxReadedTime = (req, res) => {

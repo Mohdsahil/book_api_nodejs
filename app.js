@@ -10,10 +10,10 @@ const userRouter = require("./routes/user");
 const categoryRouter = require("./routes/category");
 const bookRouter = require("./routes/book");
 const reviewRouter = require("./routes/review");
-
 var cors = require("cors");
 
 app.use(express.json());
+app.use(cors());
 app.use(express.static("upload"));
 
 // mongoose db connect
