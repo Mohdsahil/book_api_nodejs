@@ -27,13 +27,6 @@ mongoose
     console.log(err);
   });
 
-app.get("/", (req, res) => {
-  res.json({
-    success: 1,
-    message: "app is running",
-  });
-});
-
 app.use("/api", authRouter);
 app.use("/api", userRouter);
 app.use("/api", categoryRouter);
