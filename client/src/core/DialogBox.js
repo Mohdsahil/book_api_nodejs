@@ -76,10 +76,7 @@ const DialogBox = ({ book = book }) => {
     console.log("api call");
   };
   const readtimecount = () => {
-    // c = Number(timecount) + 1;
     setTimecount(timecount++);
-    // console.log("c: ", c);
-    console.log("time count: ", timecount);
   };
 
   const openReviewHandler = () => {
@@ -176,7 +173,6 @@ const DialogBox = ({ book = book }) => {
           </Toolbar>
         </AppBar>
 
-        <h2>Time : {timecount}</h2>
         <iframe
           src={`${book.pdf}#toolbar=0`}
           style={{ width: "100%", height: "510px", position: "relative" }}
