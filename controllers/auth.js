@@ -1,6 +1,6 @@
 // auth controller signi, signup or signout
 const { check, validationResult } = require("express-validator");
-const User,{authenticate} = require("../models/user");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const expressJwt = require("express-jwt");
 
@@ -40,7 +40,7 @@ exports.signin = (req, res) => {
   }
 
   User.findOne({ email }, (err, user) => {
-    if (err) {
+    if (err || !user) {
       return res.status(400).json({ error: "USER email does not exist" });
     }
     if (!user.authenticate(password)) {
