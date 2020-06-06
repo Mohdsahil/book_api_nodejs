@@ -3,7 +3,7 @@ import Layout from "./Layout";
 
 const Home = () => {
   return (
-    <Layout title="Home Page" description="little bit about myn">
+    <Layout title="Welcome to Book App" description="Read and explore more">
       <h2>I'ts from the Home Component</h2>
     </Layout>
   );
