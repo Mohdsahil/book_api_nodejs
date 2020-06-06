@@ -1,6 +1,6 @@
 // auth controller signi, signup or signout
 const { check, validationResult } = require("express-validator");
-const User = require("../models/user");
+const User,{authenticate} = require("../models/user");
 const jwt = require("jsonwebtoken");
 const expressJwt = require("express-jwt");
 
